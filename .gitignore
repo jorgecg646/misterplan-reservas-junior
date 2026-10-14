@@ -1,0 +1,17 @@
+# Composer dependencies
+/vendor/
+composer.phar
+
+# Environment files
+.env
+.env.local
+
+# Cache and logs
+*.log
+.phpunit.result.cache
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

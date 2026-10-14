@@ -1,0 +1,14 @@
+{
+    "name": "jorge/misterplan-reservas",
+    "description": "Prueba técnica para MisterPlan - Sistema de gestión de reservas de alojamiento",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "twig/twig": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

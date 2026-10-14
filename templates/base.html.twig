@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ titulo|default('Gestión de Reservas') }}{% endblock %} — MisterPlan</title>
+    
+    <!-- Fuentes Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos de la aplicación -->
+    <link rel="stylesheet" href="/css/app.css">
+    
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Barra de navegación superior -->
+    <header class="navbar">
+        <div class="container navbar-container">
+            <a href="/" class="brand">
+                <span class="brand-logo">MP</span>
+                <span class="brand-text">Mister<strong>Plan</strong> Reservas</span>
+            </a>
+            
+            <nav class="nav-links">
+                <a href="/" class="nav-link {% if app_route|default('/') == '/' %}active{% endif %}">Reservas</a>
+                <button type="button" class="btn btn-primary" id="btn-nueva-reserva">
+                    <span class="icon">+</span> Nueva Reserva
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenedor para avisos y feedback visual -->
+    <div class="container" id="alert-container">
+        {% if error is defined and error %}
+            <div class="alert alert-danger">
+                {{ error }}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Contenido principal específico de cada vista -->
+    <main class="container main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <p>MisterPlan — Prueba Técnica Desarrollador Junior PHP</p>
+            <p class="text-muted">Desarrollado con PHP Nativo, MySQL, Twig y JavaScript Vanilla.</p>
+        </div>
+    </footer>
+
+    <!-- Script principal de frontend -->
+    <script src="/js/app.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Detalle de Reserva #{{ reserva.id }} — MisterPlan{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="/">&larr; Volver al listado de reservas</a>
+</div>
+
+<section class="page-header detalle-header">
+    <div>
+        <h1 class="page-title">
+            Reserva #{{ reserva.id }}
+            {% if reserva.estado == 'confirmada' %}
+                <span class="badge badge-success">Confirmada</span>
+            {% elseif reserva.estado == 'pendiente' %}
+                <span class="badge badge-warning">Pendiente</span>
+            {% else %}
+                <span class="badge badge-danger">Cancelada</span>
+            {% endif %}
+        </h1>
+        <p class="page-subtitle">Registrada el {{ reserva.fecha_creacion|date('d/m/Y a las H:i') }}</p>
+    </div>
+
+    <div class="header-actions">
+        {% if reserva.estado == 'pendiente' %}
+            <button type="button" 
+                    class="btn btn-success btn-confirmar-reserva" 
+                    data-id="{{ reserva.id }}"
+                    data-redirect="true">
+                Confirmar Reserva
+            </button>
+        {% endif %}
+
+        {% if reserva.estado != 'cancelada' %}
+            <button type="button" 
+                    class="btn btn-danger btn-cancelar-reserva" 
+                    data-id="{{ reserva.id }}"
+                    data-redirect="true">
+                Cancelar Reserva
+            </button>
+        {% endif %}
+    </div>
+</section>
+
+<div class="grid-layout">
+    <!-- Tarjeta con la información completa de la reserva -->
+    <div class="card detail-card">
+        <h2 class="card-title">Datos del Alojamiento y Huésped</h2>
+
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span class="detail-label">Huésped</span>
+                <span class="detail-value font-bold">{{ reserva.nombre_huesped }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Correo Electrónico</span>
+                <span class="detail-value">
+                    <a href="mailto:{{ reserva.email_huesped }}">{{ reserva.email_huesped }}</a>
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Alojamiento</span>
+                <span class="detail-value font-bold">{{ reserva.nombre_alojamiento }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Importe Total</span>
+                <span class="detail-value highlight-price font-bold">
+                    {{ reserva.importe|number_format(2, ',', '.') }} €
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Fecha de Entrada</span>
+                <span class="detail-value">{{ reserva.fecha_entrada|date('d/m/Y') }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">Fecha de Salida</span>
+                <span class="detail-value">{{ reserva.fecha_salida|date('d/m/Y') }}</span>
+            </div>
+        </div>
+
+        <div class="detail-notes">
+            <span class="detail-label">Notas / Peticiones Especiales</span>
+            <p class="notes-box">
+                {% if reserva.notas %}
+                    {{ reserva.notas }}
+                {% else %}
+                    <em class="text-muted">Sin notas adicionales registradas.</em>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Timeline / Historial de eventos -->
+    <div class="card timeline-card">
+        <h2 class="card-title">Historial de Eventos (Timeline)</h2>
+        <p class="timeline-subtitle">Registro de auditoría de creación y cambios de estado.</p>
+
+        <div class="timeline">
+            {% if eventos is empty %}
+                <p class="text-muted">No hay eventos registrados para esta reserva.</p>
+            {% else %}
+                {% for evento in eventos %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker 
+                            {% if evento.tipo == 'confirmacion' or evento.tipo == 'confirmada' %}
+                                marker-success
+                            {% elseif evento.tipo == 'cancelacion' or evento.tipo == 'cancelada' %}
+                                marker-danger
+                            {% else %}
+                                marker-primary
+                            {% endif %}">
+                        </div>
+
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <span class="badge 
+                                    {% if evento.tipo == 'confirmacion' or evento.tipo == 'confirmada' %}
+                                        badge-success
+                                    {% elseif evento.tipo == 'cancelacion' or evento.tipo == 'cancelada' %}
+                                        badge-danger
+                                    {% else %}
+                                        badge-primary
+                                    {% endif %}">
+                                    {{ evento.tipo|capitalize }}
+                                </span>
+                                <time class="timeline-date text-muted">
+                                    {{ evento.fecha_creacion|date('d/m/Y H:i:s') }}
+                                </time>
+                            </div>
+                            <p class="timeline-desc">{{ evento.descripcion }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

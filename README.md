@@ -10,6 +10,8 @@ Aplicación web desarrollada en **PHP nativo (sin frameworks)**, vistas renderiz
 - **URL de la aplicación en vivo:** **[https://jorgecg645.alwaysdata.net](https://jorgecg645.alwaysdata.net)**
 - **API REST (JSON):** [https://jorgecg645.alwaysdata.net/api/reservas](https://jorgecg645.alwaysdata.net/api/reservas)
 
+![Vista previa de la aplicación](docs/screenshots/preview.png)
+
 ---
 
 ## 🚀 Cómo levantarlo en local (Paso a paso)

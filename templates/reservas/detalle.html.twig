@@ -19,7 +19,7 @@
                 <span class="badge badge-danger">Cancelada</span>
             {% endif %}
         </h1>
-        <p class="page-subtitle">Registrada el {{ reserva.fecha_creacion|date('d/m/Y a las H:i') }}</p>
+        <p class="page-subtitle">Registrada el {{ reserva.fecha_creacion|date('d/m/Y') }} a las {{ reserva.fecha_creacion|date('H:i') }}h</p>
     </div>
 
     <div class="header-actions">
@@ -69,7 +69,7 @@
             <div class="detail-item">
                 <span class="detail-label">Importe Total</span>
                 <span class="detail-value highlight-price font-bold">
-                    {{ reserva.importe|number_format(2, ',', '.') }} €
+                    {{ reserva.importe|number_format(2, ',', '.') }} &euro;
                 </span>
             </div>
 

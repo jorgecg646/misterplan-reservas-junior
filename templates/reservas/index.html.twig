@@ -101,7 +101,7 @@
                                 <div class="text-muted"><strong>Salida:</strong> {{ reserva.fecha_salida|date('d/m/Y') }}</div>
                             </td>
                             <td class="font-bold">
-                                {{ reserva.importe|number_format(2, ',', '.') }} €
+                                {{ reserva.importe|number_format(2, ',', '.') }} &euro;
                             </td>
                             <td>
                                 {% if reserva.estado == 'confirmada' %}
@@ -187,7 +187,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="importe" class="form-label">Importe Total (€) *</label>
+                    <label for="importe" class="form-label">Importe Total (&euro;) *</label>
                     <input type="number" id="importe" name="importe" step="0.01" min="1" class="form-control" required placeholder="Ej: 350.00">
                     <div class="field-error" id="error-importe"></div>
                 </div>

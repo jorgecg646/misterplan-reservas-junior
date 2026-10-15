@@ -33,6 +33,8 @@ class Database
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 // Usar sentencias preparadas reales del motor de base de datos (mayor seguridad)
                 PDO::ATTR_EMULATE_PREPARES   => false,
+                // Forzar codificación UTF-8 en la conexión MySQL
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'",
             ];
 
             try {

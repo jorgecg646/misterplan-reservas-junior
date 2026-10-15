@@ -1,0 +1,211 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Listado de Reservas — MisterPlan{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1 class="page-title">Gestión de Reservas</h1>
+        <p class="page-subtitle">Visualiza, filtra y administra las reservas de alojamiento en tiempo real.</p>
+    </div>
+</section>
+
+<!-- Barra de filtros combinables -->
+<section class="card filter-card">
+    <form id="filter-form" method="GET" action="/" class="filter-form">
+        <div class="filter-group">
+            <label for="filter-search" class="form-label">Buscar huésped</label>
+            <input type="text" 
+                   id="filter-search" 
+                   name="search" 
+                   class="form-control" 
+                   placeholder="Ej: Laura Martínez..." 
+                   value="{{ filtros.search|default('') }}">
+        </div>
+
+        <div class="filter-group">
+            <label for="filter-estado" class="form-label">Estado</label>
+            <select id="filter-estado" name="estado" class="form-control">
+                <option value="">Todos los estados</option>
+                <option value="pendiente" {% if filtros.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                <option value="confirmada" {% if filtros.estado == 'confirmada' %}selected{% endif %}>Confirmada</option>
+                <option value="cancelada" {% if filtros.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="filter-desde" class="form-label">Entrada desde</label>
+            <input type="date" 
+                   id="filter-desde" 
+                   name="fecha_desde" 
+                   class="form-control" 
+                   value="{{ filtros.fecha_desde|default('') }}">
+        </div>
+
+        <div class="filter-group">
+            <label for="filter-hasta" class="form-label">Salida hasta</label>
+            <input type="date" 
+                   id="filter-hasta" 
+                   name="fecha_hasta" 
+                   class="form-control" 
+                   value="{{ filtros.fecha_hasta|default('') }}">
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-secondary">Filtrar</button>
+            <a href="/" id="btn-limpiar-filtros" class="btn btn-light">Limpiar</a>
+        </div>
+    </form>
+</section>
+
+<!-- Tabla de reservas -->
+<section class="card table-card">
+    <div class="table-header">
+        <h2 class="table-title">Reservas registradas (<span id="total-reservas">{{ reservas|length }}</span>)</h2>
+        <div id="table-loading" class="loading-indicator" style="display: none;">
+            <span class="spinner"></span> Actualizando listado...
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table" id="tabla-reservas">
+            <thead>
+                <tr>
+                    <th># ID</th>
+                    <th>Huésped</th>
+                    <th>Alojamiento</th>
+                    <th>Fechas Estancia</th>
+                    <th>Importe</th>
+                    <th>Estado</th>
+                    <th class="text-right">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="reservas-tbody">
+                {% if reservas is empty %}
+                    <tr class="empty-row">
+                        <td colspan="7" class="text-center py-4">
+                            No se encontraron reservas con los filtros seleccionados.
+                        </td>
+                    </tr>
+                {% else %}
+                    {% for reserva in reservas %}
+                        <tr id="fila-reserva-{{ reserva.id }}">
+                            <td class="font-bold">#{{ reserva.id }}</td>
+                            <td>
+                                <div class="guest-name">{{ reserva.nombre_huesped }}</div>
+                                <div class="guest-email text-muted">{{ reserva.email_huesped }}</div>
+                            </td>
+                            <td>{{ reserva.nombre_alojamiento }}</td>
+                            <td>
+                                <div><strong>Entrada:</strong> {{ reserva.fecha_entrada|date('d/m/Y') }}</div>
+                                <div class="text-muted"><strong>Salida:</strong> {{ reserva.fecha_salida|date('d/m/Y') }}</div>
+                            </td>
+                            <td class="font-bold">
+                                {{ reserva.importe|number_format(2, ',', '.') }} €
+                            </td>
+                            <td>
+                                {% if reserva.estado == 'confirmada' %}
+                                    <span class="badge badge-success">Confirmada</span>
+                                {% elseif reserva.estado == 'pendiente' %}
+                                    <span class="badge badge-warning">Pendiente</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Cancelada</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-right actions-cell">
+                                <a href="/reservas/{{ reserva.id }}" class="btn btn-sm btn-outline" title="Ver detalle e historial">
+                                    Ver Detalle
+                                </a>
+
+                                {% if reserva.estado == 'pendiente' %}
+                                    <button type="button" 
+                                            class="btn btn-sm btn-success btn-confirmar-reserva" 
+                                            data-id="{{ reserva.id }}" 
+                                            title="Confirmar reserva">
+                                        Confirmar
+                                    </button>
+                                {% endif %}
+
+                                {% if reserva.estado != 'cancelada' %}
+                                    <button type="button" 
+                                            class="btn btn-sm btn-danger btn-cancelar-reserva" 
+                                            data-id="{{ reserva.id }}" 
+                                            title="Cancelar reserva">
+                                        Cancelar
+                                    </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Modal para Crear Nueva Reserva -->
+<div id="modal-crear-reserva" class="modal-backdrop" style="display: none;">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="modal-title">Nueva Reserva de Alojamiento</h3>
+            <button type="button" class="modal-close" id="btn-cerrar-modal">&times;</button>
+        </div>
+
+        <form id="form-crear-reserva" novalidate>
+            <div class="modal-body">
+                <div id="modal-error-alert" class="alert alert-danger" style="display: none;"></div>
+
+                <div class="form-group">
+                    <label for="nombre_huesped" class="form-label">Nombre del Huésped *</label>
+                    <input type="text" id="nombre_huesped" name="nombre_huesped" class="form-control" required placeholder="Ej: Elena García">
+                    <div class="field-error" id="error-nombre_huesped"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email_huesped" class="form-label">Correo Electrónico *</label>
+                    <input type="email" id="email_huesped" name="email_huesped" class="form-control" required placeholder="ejemplo@correo.com">
+                    <div class="field-error" id="error-email_huesped"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="nombre_alojamiento" class="form-label">Alojamiento *</label>
+                    <input type="text" id="nombre_alojamiento" name="nombre_alojamiento" class="form-control" required placeholder="Ej: Hotel Gran Vía">
+                    <div class="field-error" id="error-nombre_alojamiento"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="fecha_entrada" class="form-label">Fecha de Entrada *</label>
+                        <input type="date" id="fecha_entrada" name="fecha_entrada" class="form-control" required>
+                        <div class="field-error" id="error-fecha_entrada"></div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="fecha_salida" class="form-label">Fecha de Salida *</label>
+                        <input type="date" id="fecha_salida" name="fecha_salida" class="form-control" required>
+                        <div class="field-error" id="error-fecha_salida"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="importe" class="form-label">Importe Total (€) *</label>
+                    <input type="number" id="importe" name="importe" step="0.01" min="1" class="form-control" required placeholder="Ej: 350.00">
+                    <div class="field-error" id="error-importe"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notas" class="form-label">Notas u Observaciones (opcional)</label>
+                    <textarea id="notas" name="notas" rows="2" class="form-control" placeholder="Peticiones especiales, cuna, check-in tarde..."></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" id="btn-cancelar-modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btn-guardar-reserva">
+                    <span class="btn-text">Guardar Reserva</span>
+                    <span class="btn-spinner" style="display: none;">Guardando...</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

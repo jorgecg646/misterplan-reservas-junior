@@ -44,6 +44,7 @@ class ViewController
 
         $reservas = $this->service->listarReservas($filtros);
 
+        header('Content-Type: text/html; charset=utf-8');
         echo $this->twig->render('reservas/index.html.twig', [
             'titulo'   => 'Gestión de Reservas',
             'reservas' => $reservas,
@@ -58,6 +59,7 @@ class ViewController
     {
         $data = $this->service->obtenerDetalleReserva($id);
 
+        header('Content-Type: text/html; charset=utf-8');
         if (!$data) {
             http_response_code(404);
             echo $this->twig->render('base.html.twig', [

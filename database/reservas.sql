@@ -4,6 +4,10 @@
 CREATE DATABASE IF NOT EXISTS reservas_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE reservas_db;
 
+-- Aseguramos codificación UTF-8 para tildes y caracteres especiales
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- Borramos las tablas si ya existen para poder reimportar el archivo limpiamente
 DROP TABLE IF EXISTS reserva_evento;
 DROP TABLE IF EXISTS reserva;

@@ -9,6 +9,7 @@ composer.phar
 # Cache and logs
 *.log
 .phpunit.result.cache
+.phpunit.cache/
 
 # OS and Editor files
 .DS_Store
